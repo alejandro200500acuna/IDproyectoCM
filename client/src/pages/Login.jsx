@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../services/supabase'
@@ -15,12 +15,28 @@ export default function Login() {
     const { signIn } = useAuth()
     const navigate = useNavigate()
 
+    const [rememberMe, setRememberMe] = useState(false)
+
+    useEffect(() => {
+        const rememberedEmail = localStorage.getItem('remembered_email')
+        if (rememberedEmail) {
+            setEmail(rememberedEmail)
+            setRememberMe(true)
+        }
+    }, [])
+
     const handleLogin = async (e) => {
         e.preventDefault()
         setLoading(true)
         setError('')
 
         try {
+            if (rememberMe) {
+                localStorage.setItem('remembered_email', email)
+            } else {
+                localStorage.removeItem('remembered_email')
+            }
+
             if (role === 'student') {
                 // Student Login Implementation via RPC
                 const { data, error } = await supabase
@@ -181,7 +197,12 @@ export default function Login() {
 
                     <div className="flex items-center justify-between text-sm px-2 mb-2">
                         <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
-                            <input type="checkbox" style={{ accentColor: '#10b981' }} />
+                            <input
+                                type="checkbox"
+                                style={{ accentColor: '#10b981' }}
+                                checked={rememberMe}
+                                onChange={(e) => setRememberMe(e.target.checked)}
+                            />
                             <span>Recordarme</span>
                         </label>
 
