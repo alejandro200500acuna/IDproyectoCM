@@ -184,9 +184,7 @@ export default function Login() {
                             <input type="checkbox" style={{ accentColor: '#10b981' }} />
                             <span>Recordarme</span>
                         </label>
-                        <button type="button" className="text-blue-600 hover:underline font-medium">
-                            ¿Olvidaste tu contraseña?
-                        </button>
+
                     </div>
 
                     <button
