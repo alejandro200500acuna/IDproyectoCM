@@ -202,13 +202,7 @@ export default function ParentPortal() {
                 ) : (
                     // ID Card View
                     <div className="animate-fade-in-up">
-                        <button
-                            onClick={() => setSelectedChild(null)}
-                            className="mb-8 flex items-center gap-2 text-indigo-600 font-bold hover:translate-x-[-4px] transition-transform"
-                        >
-                            <ArrowLeft size={20} />
-                            Volver a selección
-                        </button>
+
 
                         <div className="flex flex-col xl:flex-row items-center xl:items-start justify-center gap-12">
                             {/* Card Display */}
@@ -220,23 +214,32 @@ export default function ParentPortal() {
                                     </div>
                                 </div>
 
-                                <button
-                                    onClick={() => {
-                                        if (window.confirm('¿Desea descargar este Carnet?')) {
-                                            const canvas = document.querySelector('#card-wrapper canvas')
-                                            if (canvas) {
-                                                const link = document.createElement('a')
-                                                link.download = `Carnet_${selectedChild.cedula || 'Estudiante'}.png`
-                                                link.href = canvas.toDataURL('image/png')
-                                                link.click()
+                                <div className="flex gap-4 w-full max-w-sm">
+                                    <button
+                                        onClick={() => setSelectedChild(null)}
+                                        className="flex-1 bg-white border border-gray-200 text-gray-700 shadow-md flex items-center justify-center gap-2 px-6 py-4 text-base font-semibold rounded-2xl hover:bg-gray-50 hover:border-gray-300 transition-all hover:-translate-y-1"
+                                    >
+                                        <ArrowLeft size={20} />
+                                        Volver
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (window.confirm('¿Desea descargar este Carnet?')) {
+                                                const canvas = document.querySelector('#card-wrapper canvas')
+                                                if (canvas) {
+                                                    const link = document.createElement('a')
+                                                    link.download = `Carnet_${selectedChild.cedula || 'Estudiante'}.png`
+                                                    link.href = canvas.toDataURL('image/png')
+                                                    link.click()
+                                                }
                                             }
-                                        }
-                                    }}
-                                    className="btn-primary w-full max-w-sm shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-3 px-8 py-4 text-lg rounded-2xl hover:-translate-y-1 transition-all"
-                                >
-                                    <Download size={24} />
-                                    Descargar Carnet Digital
-                                </button>
+                                        }}
+                                        className="flex-[2] btn-primary shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-3 px-6 py-4 text-lg rounded-2xl hover:-translate-y-1 transition-all"
+                                    >
+                                        <Download size={24} />
+                                        Descargar Carnet
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Details Sidebar */}
