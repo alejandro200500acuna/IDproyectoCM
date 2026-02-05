@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../services/supabase'
-import { User, Lock, Eye, EyeOff, Shield, Users, GraduationCap } from 'lucide-react'
+import { User, Lock, Eye, EyeOff, Shield, Users, GraduationCap, Fingerprint } from 'lucide-react'
 
 export default function Login() {
     const [loading, setLoading] = useState(false)
@@ -195,6 +195,16 @@ export default function Login() {
                         {loading ? 'Ingresando...' : 'INICIAR SESIÓN'}
                     </button>
                 </form>
+
+                <div className="mt-6 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 flex gap-3 text-left">
+                    <div className="text-indigo-500 mt-0.5">
+                        <Fingerprint size={20} />
+                    </div>
+                    <div className="text-xs text-indigo-800">
+                        <strong>¿Quieres usar huella digital?</strong>
+                        <p className="mt-1 text-indigo-600">Al iniciar sesión, permite que el navegador guarde tu contraseña. La próxima vez podrás entrar usando tu biométrico.</p>
+                    </div>
+                </div>
 
                 <p className="text-center text-gray-500 mt-8 text-sm font-medium">
                     Carmen Lyra School - Sistema de Gestión
