@@ -103,6 +103,10 @@ export default function DashboardLayout() {
                         <Settings size={20} />
                         <span>Ajustes</span>
                     </Link>
+                    <Link to="/profile" className={`nav-item ${isActive('/profile')}`}>
+                        <Users size={20} />
+                        <span>Ajustes de Perfil</span>
+                    </Link>
                 </nav>
 
                 <div className="px-4 pb-4">
@@ -143,7 +147,8 @@ export default function DashboardLayout() {
                                     'teachers': 'Profesores',
                                     'attendance': 'Asistencia',
                                     'designer': 'Diseñador de Carnet',
-                                    'settings': 'Ajustes'
+                                    'settings': 'Ajustes',
+                                    'profile': 'Ajustes de Perfil'
                                 }
                                 return validPaths[path] || 'Inicio'
                             })()}

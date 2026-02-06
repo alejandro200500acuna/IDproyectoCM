@@ -151,7 +151,7 @@ export default function ParentPortal() {
                         </div>
 
                         {/* Children Grid */}
-                        <div className="flex-grow flex items-center justify-center">
+                        <div className="flex justify-center mt-8">
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 max-w-5xl">
                                 {children.length > 0 ? (
                                     children.map((child) => (

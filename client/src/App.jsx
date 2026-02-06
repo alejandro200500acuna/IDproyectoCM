@@ -10,45 +10,65 @@ import DashboardLayout from './layouts/DashboardLayout'
 import DashboardHome from './pages/DashboardHome'
 import StudentPortal from './pages/StudentPortal'
 import ParentPortal from './pages/ParentPortal'
-import PlaceholderPage from './components/PlaceholderPage'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Settings from './pages/Settings'
 import SiteEditor from './pages/SiteEditor'
+import Profile from './pages/Profile'
+import Attendance from './pages/Attendance'
 
 
-const ProtectedRoute = () => {
-  const { user, loading } = useAuth()
-  if (loading) return <div className="flex h-screen items-center justify-center">Loading...</div>
-  if (!user) return <Navigate to="/login" replace />
-  return <Outlet />
+function ProtectedRoute({ children, requiredRole = null }) {
+  const { user, loading, role } = useAuth()
+
+  if (loading) return <div className="h-screen flex items-center justify-center bg-[#f8fafc]"><div className="w-8 h-8 rounded-full border-4 border-[var(--primary-color)] border-t-transparent animate-spin"></div></div>
+
+  if (!user) return <Navigate to="/login" />
+
+  // Strict Role Check for protected routes
+  if (requiredRole && role !== requiredRole) {
+    // Redirect logic based on role
+    if (role === 'student') return <Navigate to="/portal" />
+    if (role === 'parent') return <Navigate to="/parent-portal" />
+    return <Navigate to="/" />
+  }
+
+  return children
 }
 
-export default function App() {
+function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/student-portal" element={<StudentPortal />} />
-          <Route path="/parent-portal" element={<ParentPortal />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="min-h-screen bg-[#f8fafc]">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/portal" element={<StudentPortal />} />
+            <Route path="/parent-portal" element={<ParentPortal />} />
 
-
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<DashboardLayout />}>
+            {/* Protected Admin Routes */}
+            <Route path="/" element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }>
               <Route index element={<DashboardHome />} />
               <Route path="students" element={<Students />} />
               <Route path="parents" element={<Parents />} />
-              <Route path="teachers" element={<Admins />} />
               <Route path="courses" element={<Grades />} />
+              <Route path="attendance" element={<Attendance />} />
               <Route path="designer" element={<IDDesigner />} />
-              <Route path="attendance" element={<PlaceholderPage title="Attendance Management" icon={CreditCard} />} />
-              <Route path="payments" element={<PlaceholderPage title="Payment Management" icon={CreditCard} />} />
+              <Route path="teachers" element={<Admins />} />
               <Route path="settings" element={<Settings />} />
               <Route path="site-editor" element={<SiteEditor />} />
+              <Route path="profile" element={<Profile />} />
             </Route>
-          </Route>
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
+
+export default App
