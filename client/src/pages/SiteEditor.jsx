@@ -5,37 +5,46 @@ import { Save, Loader2, Layout } from 'lucide-react'
 
 export default function SiteEditor() {
     const [title, setTitle] = useState('Schooltec')
+    // Defaults matching index.css
+    const [colors, setColors] = useState({
+        primary: localStorage.getItem('theme_primary') || '#4361ee',
+        sidebar: localStorage.getItem('theme_sidebar') || '#4361ee',
+        headings: localStorage.getItem('theme_headings') || '#1f2937'
+    })
     const [loading, setLoading] = useState(false)
     const [saving, setSaving] = useState(false)
 
     useEffect(() => {
         fetchSiteSettings()
+        // Apply initial colors from storage immediately
+        applyColors(colors)
     }, [])
+
+    const applyColors = (cols) => {
+        const root = document.documentElement
+        root.style.setProperty('--primary-color', cols.primary)
+        root.style.setProperty('--sidebar-bg', cols.sidebar)
+        root.style.setProperty('--heading-color', cols.headings)
+    }
+
+    const handleColorChange = (key, value) => {
+        const newColors = { ...colors, [key]: value }
+        setColors(newColors)
+        applyColors(newColors)
+    }
 
     const fetchSiteSettings = async () => {
         try {
             setLoading(true)
-            // Try to get settings from a 'site_settings' table or similar
-            // For now, we'll just simulate it or check if we have a table for this
-            // Assuming we might need to create such table in a real migration
-            // Since we persist via localStorage/state for the "Sidebar" title right now in DashboardLayout (hardcoded),
-            // We need a place to store this. 
-            // For this implementation, we will use localStorage first to allow immediate functionality
-            // without needing immediate SQL migrations if not strictly requested, 
-            // but ideally this goes to DB. Let's start with DB check.
-
-            const { data, error } = await supabase
+            // Load Sidebar Title
+            const { data: titleData } = await supabase
                 .from('site_settings')
-                .select('*')
+                .select('value')
                 .eq('key', 'sidebar_title')
-                .single()
+                .maybeSingle()
 
-            if (data) {
-                setTitle(data.value)
-            } else if (error && error.code !== 'PGRST116') {
-                // Ignore "no rows" error, throw others
-                console.error('Error fetching settings target:', error)
-            }
+            if (titleData) setTitle(titleData.value)
+
         } catch (error) {
             console.error('Error fetching site settings', error)
         } finally {
@@ -47,34 +56,26 @@ export default function SiteEditor() {
         try {
             setSaving(true)
 
-            // Check if row exists
-            const { data: existing } = await supabase
+            // 1. Save Title
+            const { data: existingTitle } = await supabase
                 .from('site_settings')
                 .select('*')
                 .eq('key', 'sidebar_title')
                 .maybeSingle()
 
-            let result;
-            if (existing) {
-                result = await supabase
-                    .from('site_settings')
-                    .update({ value: title, updated_at: new Date() })
-                    .eq('key', 'sidebar_title')
+            if (existingTitle) {
+                await supabase.from('site_settings').update({ value: title, updated_at: new Date() }).eq('key', 'sidebar_title')
             } else {
-                result = await supabase
-                    .from('site_settings')
-                    .insert([{ key: 'sidebar_title', value: title }])
+                await supabase.from('site_settings').insert([{ key: 'sidebar_title', value: title }])
             }
 
-            if (result.error) throw result.error
-
-            // Also save to localStorage for immediate non-async sidebar updates if we implemented a listener
+            // 2. Save Colors to LocalStorage (for client-side persistence)
+            localStorage.setItem('theme_primary', colors.primary)
+            localStorage.setItem('theme_sidebar', colors.sidebar)
+            localStorage.setItem('theme_headings', colors.headings)
             localStorage.setItem('site_sidebar_title', title)
 
-            // Force reload to see changes if simple implementation
-            // window.location.reload() 
-            // Better: use a context or event, but let's stick to simple alert first
-            alert('Título actualizado correctamente. Refresca la página para ver los cambios.')
+            alert('Configuración guardada correctamente.')
 
         } catch (error) {
             alert('Error al guardar: ' + error.message)
@@ -100,7 +101,7 @@ export default function SiteEditor() {
                     <h2>Configuración Barra Lateral</h2>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Título de la Plataforma (Barra Lateral)
@@ -119,11 +120,77 @@ export default function SiteEditor() {
                         </p>
                     </div>
 
+                    <div className="w-full h-px bg-gray-100 my-4"></div>
+
+                    {/* Color Customization */}
+                    <div>
+                        <h3 className="text-gray-800 font-bold mb-4 flex items-center gap-2">
+                            <span className="w-2 h-6 bg-purple-500 rounded-full"></span>
+                            Paleta de Colores
+                        </h3>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Primary Color */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-600">Color Botones / Principal</label>
+                                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                                    <input
+                                        type="color"
+                                        value={colors.primary}
+                                        onChange={(e) => handleColorChange('primary', e.target.value)}
+                                        className="w-10 h-10 rounded-lg cursor-pointer border-0 bg-transparent p-0"
+                                    />
+                                    <span className="text-sm font-mono text-gray-500 uppercase">{colors.primary}</span>
+                                </div>
+                            </div>
+
+                            {/* Sidebar Color */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-600">Color Barra Lateral</label>
+                                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                                    <input
+                                        type="color"
+                                        value={colors.sidebar}
+                                        onChange={(e) => handleColorChange('sidebar', e.target.value)}
+                                        className="w-10 h-10 rounded-lg cursor-pointer border-0 bg-transparent p-0"
+                                    />
+                                    <span className="text-sm font-mono text-gray-500 uppercase">{colors.sidebar}</span>
+                                </div>
+                            </div>
+
+                            {/* Heading Color */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-600">Color de Títulos</label>
+                                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                                    <input
+                                        type="color"
+                                        value={colors.headings}
+                                        onChange={(e) => handleColorChange('headings', e.target.value)}
+                                        className="w-10 h-10 rounded-lg cursor-pointer border-0 bg-transparent p-0"
+                                    />
+                                    <span className="text-sm font-mono text-gray-500 uppercase">{colors.headings}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-4 flex gap-2">
+                            <button
+                                onClick={() => {
+                                    handleColorChange('primary', '#4361ee')
+                                    handleColorChange('sidebar', '#4361ee')
+                                    handleColorChange('headings', '#1f2937')
+                                }}
+                                className="text-xs text-indigo-500 font-medium hover:underline"
+                            >
+                                Restaurar valores por defecto
+                            </button>
+                        </div>
+                    </div>
+
                     <div className="pt-4 flex justify-end">
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="btn-primary flex items-center gap-2 px-6 py-3 rounded-xl shadow-lg shadow-indigo-200"
+                            className="btn-primary flex items-center gap-2 px-6 py-3 rounded-xl shadow-lg shadow-indigo-200 transition-all hover:scale-105 active:scale-95"
                         >
                             {saving ? (
                                 <Loader2 className="animate-spin" size={20} />

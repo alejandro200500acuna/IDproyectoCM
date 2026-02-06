@@ -58,6 +58,8 @@
   --radius-2xl: 2rem;
 
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Customizable Heading Color */
+  --heading-color: #1f2937;
 }
 
 /* Reset & Base */
@@ -76,6 +78,15 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--heading-color);
 }
 
 a {

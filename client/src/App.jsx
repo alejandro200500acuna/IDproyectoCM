@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { CreditCard, Settings as SettingsIcon } from 'lucide-react'
 import Login from './pages/Login'
@@ -36,6 +37,18 @@ function ProtectedRoute({ children, requiredRole = null }) {
 }
 
 function App() {
+  useEffect(() => {
+    // Load and Apply Global Theme
+    const root = document.documentElement
+    const primary = localStorage.getItem('theme_primary')
+    const sidebar = localStorage.getItem('theme_sidebar')
+    const headings = localStorage.getItem('theme_headings')
+
+    if (primary) root.style.setProperty('--primary-color', primary)
+    if (sidebar) root.style.setProperty('--sidebar-bg', sidebar)
+    if (headings) root.style.setProperty('--heading-color', headings)
+  }, [])
+
   return (
     <AuthProvider>
       <BrowserRouter>
