@@ -10,6 +10,8 @@ export default function Grades() {
     const [searchTerm, setSearchTerm] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false)
 
+    const [selectedIds, setSelectedIds] = useState([])
+
     useEffect(() => {
         fetchGrades()
     }, [])
@@ -24,6 +26,7 @@ export default function Grades() {
 
             if (error) throw error
             setGrades(data || [])
+            setSelectedIds([]) // Reset selection on fetch
         } catch (error) {
             console.error('Error fetching grades:', error)
         } finally {
@@ -34,6 +37,43 @@ export default function Grades() {
     const filteredGrades = grades.filter(grade =>
         grade.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
+
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            setSelectedIds(filteredGrades.map(g => g.id))
+        } else {
+            setSelectedIds([])
+        }
+    }
+
+    const handleSelectOne = (id) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(selectedId => selectedId !== id))
+        } else {
+            setSelectedIds([...selectedIds, id])
+        }
+    }
+
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return
+
+        if (!window.confirm('¿Está seguro que desea eliminar todo el registro? SI o NO')) {
+            return
+        }
+
+        try {
+            const { error } = await supabase
+                .from('grades')
+                .delete()
+                .in('id', selectedIds)
+
+            if (error) throw error
+
+            fetchGrades()
+        } catch (error) {
+            alert('Error al eliminar: ' + error.message)
+        }
+    }
 
     return (
         <div className="flex flex-col gap-6">
@@ -53,6 +93,15 @@ export default function Grades() {
                 </div>
 
                 <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+                    {selectedIds.length > 0 && (
+                        <button
+                            onClick={handleBulkDelete}
+                            className="bg-red-50 text-red-600 hover:bg-red-100 flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-colors animate-fade-in"
+                        >
+                            <Trash2 size={20} />
+                            Eliminar ({selectedIds.length})
+                        </button>
+                    )}
                     <button
                         onClick={() => setIsModalOpen(true)}
                         className="btn-primary flex items-center gap-2 px-6 py-3 rounded-full shadow-lg shadow-blue-500/30"
@@ -77,7 +126,12 @@ export default function Grades() {
                         <thead>
                             <tr>
                                 <th className="col-checkbox pl-6">
-                                    <input type="checkbox" className="rounded border-gray-300 text-[var(--primary-color)] focus:ring-[var(--primary-color)]" />
+                                    <input
+                                        type="checkbox"
+                                        className="rounded border-gray-300 text-[var(--primary-color)] focus:ring-[var(--primary-color)]"
+                                        checked={selectedIds.length === filteredGrades.length && filteredGrades.length > 0}
+                                        onChange={handleSelectAll}
+                                    />
                                 </th>
                                 <th className="text-left">Nombre del Curso</th>
                                 <th className="text-center">Año Académico</th>
@@ -87,9 +141,14 @@ export default function Grades() {
                         </thead>
                         <tbody>
                             {filteredGrades.map((grade) => (
-                                <tr key={grade.id} className="group hover:bg-white transition-all border-b border-transparent hover:shadow-sm">
+                                <tr key={grade.id} className={`group hover:bg-white transition-all border-b border-transparent hover:shadow-sm ${selectedIds.includes(grade.id) ? 'bg-blue-50/50' : ''}`}>
                                     <td className="col-checkbox pl-6">
-                                        <input type="checkbox" className="rounded border-gray-300 text-[var(--primary-color)] focus:ring-[var(--primary-color)]" />
+                                        <input
+                                            type="checkbox"
+                                            className="rounded border-gray-300 text-[var(--primary-color)] focus:ring-[var(--primary-color)]"
+                                            checked={selectedIds.includes(grade.id)}
+                                            onChange={() => handleSelectOne(grade.id)}
+                                        />
                                     </td>
                                     <td>
                                         <div className="flex items-center gap-3">

@@ -15,10 +15,39 @@ import {
     IdCard
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { supabase } from '../services/supabase'
+import { useState, useEffect } from 'react'
 
 export default function DashboardLayout() {
     const { signOut, user } = useAuth()
     const location = useLocation()
+    const [title, setTitle] = useState('Schooltec')
+
+    useEffect(() => {
+        // Load from localStorage first to prevent flickering
+        const savedTitle = localStorage.getItem('site_sidebar_title')
+        if (savedTitle) setTitle(savedTitle)
+
+        // Then fetch fresh data
+        fetchTitle()
+    }, [])
+
+    const fetchTitle = async () => {
+        try {
+            const { data } = await supabase
+                .from('site_settings')
+                .select('value')
+                .eq('key', 'sidebar_title')
+                .maybeSingle()
+
+            if (data?.value) {
+                setTitle(data.value)
+                localStorage.setItem('site_sidebar_title', data.value)
+            }
+        } catch (error) {
+            console.error('Error fetching title:', error)
+        }
+    }
 
     const isActive = (path) => {
         return location.pathname === path ? 'active' : ''
@@ -33,7 +62,7 @@ export default function DashboardLayout() {
                         <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-white backdrop-blur-sm">
                             <GraduationCap size={20} />
                         </div>
-                        <h2 className="text-white font-bold text-xl tracking-tight">Schooltec</h2>
+                        <h2 className="text-white font-bold text-xl tracking-tight">{title}</h2>
                     </div>
                 </div>
 
@@ -62,6 +91,10 @@ export default function DashboardLayout() {
                         <Users size={20} />
                         <span>Asistencia</span>
                     </Link>
+                    <Link to="/site-editor" className={`nav-item ${isActive('/site-editor')}`}>
+                        <LayoutDashboard size={20} />
+                        <span>Editor Sitio</span>
+                    </Link>
                     <Link to="/designer" className={`nav-item ${isActive('/designer')}`}>
                         <IdCard size={20} />
                         <span>Diseñador de Carnet</span>
@@ -72,8 +105,18 @@ export default function DashboardLayout() {
                     </Link>
                 </nav>
 
+                <div className="px-4 pb-4">
+                    <button
+                        onClick={signOut}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white text-rose-600 font-bold rounded-full shadow-lg hover:bg-rose-500 hover:text-white transition-all duration-200 transform hover:scale-[1.02]"
+                    >
+                        <LogOut size={18} />
+                        <span>Cerrar Sesión</span>
+                    </button>
+                </div>
+
                 {/* UPGRADE CARD / REQUEST ADMIN */}
-                <div className="sidebar-premium-card mx-4 mb-6 mt-auto">
+                <div className="sidebar-premium-card mx-4 mb-6 !mt-2">
                     <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 text-white backdrop-blur-md">
                         <Shield size={20} />
                     </div>
@@ -82,15 +125,6 @@ export default function DashboardLayout() {
                         Ser Admin &rarr;
                     </button>
                 </div>
-
-                {/* Sign Out Button - Moved outside for clarity */}
-                <button
-                    onClick={signOut}
-                    className="flex items-center justify-center gap-3 px-6 py-3 mx-4 mb-6 text-sm font-bold text-rose-600 bg-white hover:bg-rose-50 rounded-xl shadow-lg transition-all duration-200 mt-4 group"
-                >
-                    <LogOut size={18} className="group-hover:scale-110 transition-transform" />
-                    <span>Cerrar Sesión</span>
-                </button>
             </aside>
 
             {/* MAIN CONTENT WRAPPER */}
@@ -147,6 +181,6 @@ export default function DashboardLayout() {
                     <Outlet />
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

@@ -11,8 +11,9 @@ import DashboardHome from './pages/DashboardHome'
 import StudentPortal from './pages/StudentPortal'
 import ParentPortal from './pages/ParentPortal'
 import PlaceholderPage from './components/PlaceholderPage'
-import Settings from './pages/Settings'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import Settings from './pages/Settings'
+import SiteEditor from './pages/SiteEditor'
 
 
 const ProtectedRoute = () => {
@@ -43,6 +44,7 @@ export default function App() {
               <Route path="attendance" element={<PlaceholderPage title="Attendance Management" icon={CreditCard} />} />
               <Route path="payments" element={<PlaceholderPage title="Payment Management" icon={CreditCard} />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="site-editor" element={<SiteEditor />} />
             </Route>
           </Route>
         </Routes>

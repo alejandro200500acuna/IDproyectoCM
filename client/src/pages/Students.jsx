@@ -181,17 +181,37 @@ export default function Students() {
                     full_name: row.nombre,
                     cedula: row.cedula,
                     grade_id: gradeId,
-                    email: row.email || null,
+                    // Email removed as per schema
                     password: row.password || '123456',
                     academic_year: row.academic_year || new Date().getFullYear()
                 })
             }
 
             if (studentsToInsert.length > 0) {
-                const { error } = await supabase.from('students').insert(studentsToInsert)
+                // Use upsert to handle duplicates (requires unique constraint on 'cedula')
+                const { data, error } = await supabase
+                    .from('students')
+                    .upsert(studentsToInsert, {
+                        onConflict: 'cedula',
+                        ignoreDuplicates: true,
+                        count: 'exact'
+                    })
+                    .select()
+
                 if (error) throw error
 
-                alert(`Se importaron ${studentsToInsert.length} estudiantes correctamente.`)
+                // Calculate how many were actually inserted
+                // Note: upsert returns the rows that were inserted or updated. 
+                // With ignoreDuplicates: true, it only returns rows that were inserted.
+                const insertedCount = data ? data.length : 0
+                const ignoredCount = studentsToInsert.length - insertedCount
+
+                if (ignoredCount > 0) {
+                    alert(`Proceso completado.\n\n- Nuevos estudiantes agregados: ${insertedCount}\n- Estudiantes ya existentes ignorados: ${ignoredCount}\n\nSe detectaron estudiantes ya con registros, se pasaron por alto y solo se agregaron los nuevos.`)
+                } else {
+                    alert(`Se importaron ${insertedCount} estudiantes correctamente.`)
+                }
+
                 fetchStudents()
             } else {
                 alert('No se encontraron datos válidos para importar.')
@@ -241,7 +261,7 @@ export default function Students() {
                         <input
                             type="text"
                             placeholder="Buscar estudiantes..."
-                            className="w-full pl-12 pr-6 py-3 bg-[#f8fafc] border-none rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]/20 text-sm font-medium text-gray-600 transition-all placeholder:text-gray-400"
+                            className="w-full h-11 pl-12 pr-6 bg-[#f8fafc] border-none rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]/20 text-sm font-medium text-gray-600 transition-all placeholder:text-gray-400 flex items-center"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -252,7 +272,7 @@ export default function Students() {
                         <select
                             value={selectedGrade}
                             onChange={(e) => setSelectedGrade(e.target.value)}
-                            className="appearance-none pl-11 pr-10 py-3 bg-[#f8fafc] border-none rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]/20 text-sm font-semibold text-gray-600 cursor-pointer min-w-[200px]"
+                            className="appearance-none h-11 pl-11 pr-10 bg-[#f8fafc] border-none rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]/20 text-sm font-semibold text-gray-600 cursor-pointer min-w-[200px] flex items-center"
                         >
                             <option value="all">Todos los Grados</option>
                             {availableGrades.map(grade => (

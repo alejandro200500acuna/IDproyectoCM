@@ -156,14 +156,12 @@ export default function DashboardHome() {
                 </div>
 
                 {/* Attendance Chart (Kept but simplified layout) */}
-                <div className="widget-card">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-lg font-bold text-gray-800">Actividad Reciente</h3>
-                    </div>
-
-                    <div className="flex items-center justify-center h-48 text-gray-400 text-sm">
-                        Gráfico de actividad próximamente
-                    </div>
+                <div className="widget-card flex items-center justify-center p-6">
+                    <img
+                        src="/school-logo.png"
+                        alt="Logo Colegio"
+                        className="w-48 h-48 object-contain"
+                    />
                 </div>
 
             </div>
