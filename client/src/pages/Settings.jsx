@@ -257,7 +257,8 @@ export default function Settings() {
                                 <input
                                     type="text"
                                     required
-                                    className="w-full pl-16 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 placeholder:text-gray-400"
+                                    style={{ paddingLeft: '3.5rem' }}
+                                    className="w-full pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 placeholder:text-gray-400"
                                     placeholder="Ej: María González"
                                     value={formData.full_name}
                                     onChange={e => setFormData({ ...formData, full_name: e.target.value })}
@@ -272,7 +273,8 @@ export default function Settings() {
                                 <input
                                     type="email"
                                     required
-                                    className="w-full pl-16 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 placeholder:text-gray-400"
+                                    style={{ paddingLeft: '3.5rem' }}
+                                    className="w-full pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 placeholder:text-gray-400"
                                     placeholder="admin@school.com"
                                     value={formData.email}
                                     onChange={e => setFormData({ ...formData, email: e.target.value })}
@@ -290,7 +292,8 @@ export default function Settings() {
                                     type="text"
                                     required={!editingId}
                                     minLength={6}
-                                    className="w-full pl-16 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 placeholder:text-gray-400"
+                                    style={{ paddingLeft: '3.5rem' }}
+                                    className="w-full pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-gray-900 placeholder:text-gray-400"
                                     placeholder={editingId ? "Dejar en blanco para mantener actual" : "Mínimo 6 caracteres"}
                                     value={formData.password}
                                     onChange={e => setFormData({ ...formData, password: e.target.value })}

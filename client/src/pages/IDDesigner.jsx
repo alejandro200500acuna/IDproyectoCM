@@ -402,6 +402,9 @@ export default function IDDesigner() {
                     <button onClick={() => addPlaceholder('full_name')} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors text-left group">
                         <div className="w-8 h-8 rounded-full bg-indigo-50 text-[var(--primary-color)] flex items-center justify-center group-hover:bg-indigo-100 transition-colors"><span className="font-bold text-xs">ABC</span></div><span className="text-sm font-medium text-gray-700">Nombre Estudiante</span>
                     </button>
+                    <button onClick={() => addPlaceholder('cedula')} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors text-left group">
+                        <div className="w-8 h-8 rounded-full bg-indigo-50 text-[var(--primary-color)] flex items-center justify-center group-hover:bg-indigo-100 transition-colors"><span className="font-bold text-xs">ID</span></div><span className="text-sm font-medium text-gray-700">Cédula Estudiante</span>
+                    </button>
                     <button onClick={() => addPlaceholder('photo')} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors text-left group">
                         <div className="w-8 h-8 rounded-full bg-indigo-50 text-[var(--primary-color)] flex items-center justify-center group-hover:bg-indigo-100 transition-colors"><ImageIcon size={18} /></div><span className="text-sm font-medium text-gray-700">Foto Estudiante</span>
                     </button>

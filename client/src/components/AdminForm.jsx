@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../services/supabase'
 
-export default function AdminForm({ onSuccess, onCancel, initialData = null }) {
+export default function AdminForm({ onSuccess, onCancel, initialData = null, targetRole = 'admin' }) {
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
         full_name: '',
         email: '',
-        role: 'admin'
+        role: targetRole
     })
 
     useEffect(() => {
@@ -14,10 +14,10 @@ export default function AdminForm({ onSuccess, onCancel, initialData = null }) {
             setFormData({
                 full_name: initialData.full_name || '',
                 email: initialData.email || '',
-                role: initialData.role || 'admin'
+                role: initialData.role || targetRole
             })
         }
-    }, [initialData])
+    }, [initialData, targetRole])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -25,7 +25,7 @@ export default function AdminForm({ onSuccess, onCancel, initialData = null }) {
 
         try {
             if (initialData) {
-                // Update Admin
+                // Update Admin/Teacher
                 const { error } = await supabase
                     .from('profiles')
                     .update({
@@ -36,14 +36,14 @@ export default function AdminForm({ onSuccess, onCancel, initialData = null }) {
 
                 if (error) throw error
             } else {
-                // Create Admin
+                // Create Admin/Teacher
                 // Note: This creates a profile. Ideally, this should be linked to an Auth user.
                 const { error } = await supabase
                     .from('profiles')
                     .insert([{
                         full_name: formData.full_name,
                         email: formData.email,
-                        role: 'admin'
+                        role: targetRole
                     }])
 
                 if (error) throw error

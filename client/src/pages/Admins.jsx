@@ -20,7 +20,7 @@ export default function Admins() {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
-                .eq('role', 'admin')
+                .eq('role', 'teacher')
                 .order('created_at', { ascending: false })
 
             if (error) throw error
@@ -159,6 +159,7 @@ export default function Admins() {
                         fetchAdmins()
                     }}
                     onCancel={() => setIsModalOpen(false)}
+                    targetRole="teacher"
                 />
             </Modal>
         </div>
