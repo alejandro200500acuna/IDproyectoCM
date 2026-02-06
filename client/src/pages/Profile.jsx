@@ -108,7 +108,7 @@ export default function Profile() {
 
     return (
         <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-800 mb-8 font-display">Ajustes de Perfil</h2>
+
 
             <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-white/50 backdrop-blur-sm">
 
@@ -171,6 +171,8 @@ export default function Profile() {
                                     placeholder="Nueva contraseña"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
+                                    // Disable autoComplete to prevent browser interference if needed, but usually fine
+                                    autoComplete="new-password"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -180,6 +182,7 @@ export default function Profile() {
                                     placeholder="Confirmar contraseña"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
+                                    autoComplete="new-password"
                                 />
                             </div>
                         </div>
@@ -189,7 +192,7 @@ export default function Profile() {
                     {/* Messages */}
                     {message.text && (
                         <div className={`p-4 rounded-xl text-sm font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2 ${message.type === 'error' ? 'bg-red-50 text-red-600' :
-                                message.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'
+                            message.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'
                             }`}>
                             {message.type === 'success' && <div className="w-2 h-2 rounded-full bg-green-500"></div>}
                             {message.type === 'error' && <div className="w-2 h-2 rounded-full bg-red-500"></div>}
@@ -197,12 +200,27 @@ export default function Profile() {
                         </div>
                     )}
 
-                    <div className="pt-4">
+                    <div className="pt-6 flex gap-4">
+                        <button
+                            type="button"
+                            disabled={loading}
+                            onClick={() => {
+                                // Reset form or navigate back
+                                fetchProfile()
+                                setNewPassword('')
+                                setConfirmPassword('')
+                                setMessage({ type: '', text: '' })
+                            }}
+                            className="flex-1 py-4 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all active:scale-[0.98]"
+                        >
+                            Cancelar
+                        </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`w-full py-4 rounded-xl font-bold text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all transform hover:scale-[1.01] active:scale-[0.99] ${loading ? 'bg-indigo-400 cursor-wait' : 'bg-indigo-600 hover:bg-indigo-700'
+                            className={`flex-[2] py-4 rounded-xl font-bold text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all transform hover:scale-[1.01] active:scale-[0.99] ${loading ? 'bg-indigo-400 cursor-wait' : 'bg-indigo-600 hover:bg-indigo-700'
                                 }`}
+                            style={{ backgroundColor: 'var(--primary-color, #4361ee)' }}
                         >
                             {loading ? <Loader className="animate-spin" size={20} /> : <Save size={20} />}
                             {loading ? 'Guardando...' : 'Guardar Cambios'}
